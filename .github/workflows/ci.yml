@@ -35,6 +35,8 @@ jobs:
             toolchain: beta
     steps:
       - uses: actions/checkout@v2
+      - name: Checkout Submodule
+        run: git submodule update --init --recursive
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -43,6 +45,6 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
           override: true
       - run: ${{ matrix.deps }}
-      - name: Test lua-sys
+      - name: Test
         run: cargo test --target ${{ matrix.target }}
       
