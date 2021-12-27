@@ -1,6 +1,6 @@
 [package]
-name = "lua_sys"
-version = "0.1.0"
+name = "lua-sys"
+version = "5.4.4"
 authors = ["Michael Pollind <mpollind@gmail.com>"]
 edition = "2018"
 links = "lua"
