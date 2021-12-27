@@ -6,7 +6,7 @@
 pub extern crate libc;
 
 use std::os::raw::{c_char, c_int};
-use std::{ptr, str};
+use std::ptr;
 
 pub mod bindings {
     #![allow(non_upper_case_globals)]
@@ -31,76 +31,6 @@ pub use {
     bindings::LUA_SIGNATURE
 };
 
-#[repr(i32)]
-#[derive(PartialEq)]
-pub enum LUA_BASE_TYPE {
-    LUA_TNONE = bindings::LUA_TNONE as i32,
-    LUA_TNIL = bindings::LUA_TNIL as i32,
-    LUA_TBOOLEAN = bindings::LUA_TBOOLEAN as i32,
-    LUA_TLIGHTUSERDATA = bindings::LUA_TLIGHTUSERDATA as i32,
-    LUA_TNUMBER = bindings::LUA_TNUMBER as i32,
-    LUA_TSTRING = bindings::LUA_TSTRING as i32,
-    LUA_TTABLE = bindings::LUA_TTABLE as i32,
-    LUA_TFUNCTION = bindings::LUA_TFUNCTION as i32,
-    LUA_TUSERDATA = bindings::LUA_TUSERDATA as i32,
-    LUA_TTHREAD = bindings::LUA_TTHREAD as i32,
-    LUA_NUMTYPES = bindings::LUA_NUMTYPES as i32,
-}
-
-impl LUA_BASE_TYPE {
-    pub fn to_typename(&self) -> Option<&'static str> {
-        match self {
-            LUA_BASE_TYPE::LUA_TNIL => return Some("no value"),
-            LUA_BASE_TYPE::LUA_TBOOLEAN => return Some("boolean"),
-            LUA_BASE_TYPE::LUA_TLIGHTUSERDATA => return Some("userdata"),
-            LUA_BASE_TYPE::LUA_TNUMBER => return Some("number"),
-            LUA_BASE_TYPE::LUA_TSTRING => return Some("string"),
-            LUA_BASE_TYPE::LUA_TTABLE => return Some("table"),
-            LUA_BASE_TYPE::LUA_TFUNCTION => return Some("function"),
-            LUA_BASE_TYPE::LUA_TUSERDATA => return Some("userdata"),
-            LUA_BASE_TYPE::LUA_TTHREAD => return Some("thread"),
-            _ => return None,
-        };
-    }
-}
-
-/*
-** Comparison and arithmetic functions
-*/
-#[repr(i32)]
-#[derive(PartialEq)]
-pub enum LUA_ARITH_OP {
-    LUA_OPADD = bindings::LUA_OPADD as i32,
-    LUA_OPSUB = bindings::LUA_OPSUB as i32,
-    LUA_OPMUL = bindings::LUA_OPMUL as i32,
-    LUA_OPMOD = bindings::LUA_OPMOD as i32,
-    LUA_OPPOW = bindings::LUA_OPPOW as i32,
-    LUA_OPDIV = bindings::LUA_OPDIV as i32,
-    LUA_OPIDIV = bindings::LUA_OPIDIV as i32,
-    LUA_OPBAND = bindings::LUA_OPBAND as i32,
-    LUA_OPBOR = bindings::LUA_OPBOR as i32,
-    LUA_OPBXOR = bindings::LUA_OPBXOR as i32,
-    LUA_OPSHL = bindings::LUA_OPSHL as i32,
-    LUA_OPSHR = bindings::LUA_OPSHR as i32,
-    LUA_OPUNM = bindings::LUA_OPUNM as i32,
-    LUA_OPBNOT = bindings::LUA_OPBNOT as i32,
-}
-
-#[repr(i32)]
-#[derive(PartialEq)]
-pub enum LUA_GC {
-    LUA_GCSTOP = bindings::LUA_GCSTOP as i32,
-    LUA_GCRESTART = bindings::LUA_GCRESTART as i32,
-    LUA_GCCOLLECT = bindings::LUA_GCCOLLECT as i32,
-    LUA_GCCOUNT = bindings::LUA_GCCOUNT as i32,
-    LUA_GCCOUNTB = bindings::LUA_GCCOUNTB as i32,
-    LUA_GCSTEP = bindings::LUA_GCSTEP as i32,
-    LUA_GCSETPAUSE = bindings::LUA_GCSETPAUSE as i32,
-    LUA_GCSETSTEPMUL = bindings::LUA_GCSETSTEPMUL as i32,
-    LUA_GCISRUNNING = bindings::LUA_GCISRUNNING as i32,
-    LUA_GCGEN = bindings::LUA_GCGEN as i32,
-    LUA_GCINC = bindings::LUA_GCINC as i32,
-}
 
 pub use {
     bindings::lua_Alloc, bindings::lua_CFunction, bindings::lua_Integer, bindings::lua_KContext,
@@ -133,22 +63,8 @@ pub use {
     bindings::lua_toboolean, bindings::lua_tocfunction, bindings::lua_tointegerx,
     bindings::lua_tolstring, bindings::lua_tonumberx, bindings::lua_topointer,
     bindings::lua_tothread, bindings::lua_touserdata, bindings::lua_typename,
+    bindings::lua_type,
 };
-
-pub unsafe fn lua_type(state: *mut lua_State, idx: c_int) -> LUA_BASE_TYPE {
-    match bindings::lua_type(state, idx) {
-        x if x == bindings::LUA_TNIL as i32 => LUA_BASE_TYPE::LUA_TNIL,
-        x if x == bindings::LUA_TBOOLEAN as i32 => LUA_BASE_TYPE::LUA_TBOOLEAN,
-        x if x == bindings::LUA_TLIGHTUSERDATA as i32 => LUA_BASE_TYPE::LUA_TLIGHTUSERDATA,
-        x if x == bindings::LUA_TNUMBER as i32 => LUA_BASE_TYPE::LUA_TNUMBER,
-        x if x == bindings::LUA_TSTRING as i32 => LUA_BASE_TYPE::LUA_TSTRING,
-        x if x == bindings::LUA_TTABLE as i32 => LUA_BASE_TYPE::LUA_TTABLE,
-        x if x == bindings::LUA_TFUNCTION as i32 => LUA_BASE_TYPE::LUA_TFUNCTION,
-        x if x == bindings::LUA_TUSERDATA as i32 => LUA_BASE_TYPE::LUA_TUSERDATA,
-        x if x == bindings::LUA_TTHREAD as i32 => LUA_BASE_TYPE::LUA_TTHREAD,
-        _ => LUA_BASE_TYPE::LUA_TNONE,
-    }
-}
 
 /*
 ** push functions (C -> stack)
@@ -214,9 +130,9 @@ pub use {bindings::lua_setwarnf, bindings::lua_warning};
 /*
 ** garbage-collection function and options
 */
-pub unsafe fn lua_gc(state: *mut lua_State, what: LUA_GC) -> c_int {
-    return bindings::lua_gc(state, what as i32);
-}
+pub use {
+    bindings::lua_gc
+};
 
 /*
 ** miscellaneous functions
@@ -242,28 +158,28 @@ pub unsafe fn lua_pop(state: *mut lua_State, n: c_int) {
     lua_settop(state, -(n) - 1);
 }
 pub unsafe fn lua_isfunction(state: *mut lua_State, n: c_int) -> bool {
-    return lua_type(state, n) == LUA_BASE_TYPE::LUA_TFUNCTION;
+    return lua_type(state, n) == bindings::LUA_TFUNCTION as i32;
 }
 pub unsafe fn lua_istable(state: *mut lua_State, n: c_int) -> bool {
-    return lua_type(state, n) == LUA_BASE_TYPE::LUA_TTABLE;
+    return lua_type(state, n) == bindings::LUA_TTABLE as i32;
 }
 pub unsafe fn lua_islightuserdata(state: *mut lua_State, n: c_int) -> bool {
-    return lua_type(state, n) == LUA_BASE_TYPE::LUA_TLIGHTUSERDATA;
+    return lua_type(state, n) == bindings::LUA_TLIGHTUSERDATA as i32;
 }
 pub unsafe fn lua_isnil(state: *mut lua_State, n: c_int) -> bool {
-    return lua_type(state, n) == LUA_BASE_TYPE::LUA_TNIL;
+    return lua_type(state, n) == bindings::LUA_TNIL as i32;
 }
 pub unsafe fn lua_isboolean(state: *mut lua_State, n: c_int) -> bool {
-    return lua_type(state, n) == LUA_BASE_TYPE::LUA_TBOOLEAN;
+    return lua_type(state, n) == bindings::LUA_TBOOLEAN as i32;
 }
 pub unsafe fn lua_isthread(state: *mut lua_State, n: c_int) -> bool {
-    return lua_type(state, n) == LUA_BASE_TYPE::LUA_TTHREAD;
+    return lua_type(state, n) == bindings::LUA_TTHREAD as i32;
 }
 pub unsafe fn lua_isnone(state: *mut lua_State, n: c_int) -> bool {
-    return lua_type(state, n) == LUA_BASE_TYPE::LUA_TNONE;
+    return lua_type(state, n) == bindings::LUA_TNONE  as i32;
 }
 pub unsafe fn lua_isnoneornil(state: *mut lua_State, n: c_int) -> bool {
-    return lua_type(state, n) == LUA_BASE_TYPE::LUA_TNONE;
+    return lua_type(state, n) == bindings::LUA_TNONE  as i32; 
 }
 
 pub unsafe fn lua_pushliteral(state: *mut lua_State, str: *const c_char) -> *const c_char {
