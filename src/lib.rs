@@ -1,11 +1,12 @@
+// Copyright 2021 The Terasology Foundation
+// SPDX-License-Identifier: Apache-2.0
+
 #![allow(non_camel_case_types)]
 
-// pub extern crate libc;
-// extern crate bitflags;
 pub extern crate libc;
 
 use std::os::raw::{c_char, c_int};
-use std::ptr;
+use std::{ptr, str};
 
 pub mod bindings {
     #![allow(non_upper_case_globals)]
@@ -13,6 +14,22 @@ pub mod bindings {
     #![allow(non_snake_case)]
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 }
+
+pub const LUA_RIDX_GLOBALS: bindings::lua_Integer = bindings::LUA_RIDX_GLOBALS as bindings::lua_Integer;
+pub const LUA_REGISTRYINDEX: c_int = bindings::LUA_REGISTRYINDEX;
+
+pub use {
+    bindings::LUA_VERSION_MAJOR,
+    bindings::LUA_VERSION_MINOR,
+    bindings::LUA_VERSION_RELEASE,
+    bindings::LUA_VERSION_NUM,
+    bindings::LUA_VERSION_RELEASE_NUM,
+    bindings::LUA_VERSION,
+    bindings::LUA_RELEASE,
+    bindings::LUA_COPYRIGHT,
+    bindings::LUA_AUTHORS,
+    bindings::LUA_SIGNATURE
+};
 
 #[repr(i32)]
 #[derive(PartialEq)]
@@ -90,9 +107,6 @@ pub use {
     bindings::lua_Number, bindings::lua_State, bindings::lua_Unsigned, bindings::size_t,
     bindings::size_t as wchar_t,
 };
-
-const LUA_RIDX_GLOBALS: bindings::lua_Integer = bindings::LUA_RIDX_GLOBALS as bindings::lua_Integer;
-const LUA_REGISTRYINDEX: c_int = bindings::LUA_REGISTRYINDEX;
 
 /*
 ** state manipulation
