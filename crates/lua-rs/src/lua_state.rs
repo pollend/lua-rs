@@ -1,5 +1,5 @@
 use std::ptr;
-// use std::os::raw::{c_int};
+use std::ffi::CString;
 
 pub struct LuaState {
     main_state: *mut ffi::lua_State
@@ -7,25 +7,51 @@ pub struct LuaState {
 
 type luaCFunction = fn(ctx: LuaState) -> i32;
 
-pub struct LuaRegistry {
-    
-    #[allow(dead_code)]
-    pub key: &'static str,
-
-    #[allow(dead_code)]
+pub struct LuaLibrary {
+    pub name: &'static str,
     pub func: ffi::lua_CFunction,
 }
 
-
-impl LuaRegistry {
-    pub fn new(key: &'static str, func: ffi::lua_CFunction) -> LuaRegistry{
-        return LuaRegistry {
-            key: key,
-            func: func
-        }
-        
-    }
-}
+pub static BASE_LIBRARY: LuaLibrary = LuaLibrary {
+    name: "_G", 
+    func: Some(ffi::luaopen_base)
+}; 
+pub static PACKAGE_LIBRARY: LuaLibrary = LuaLibrary {
+    name: "package", 
+    func: Some(ffi::luaopen_package)
+}; 
+pub static COROUTINE_LIBRARY: LuaLibrary = LuaLibrary {
+    name: "coroutine", 
+    func: Some(ffi::luaopen_coroutine)
+};
+pub static TABLE_LIBRARY : LuaLibrary = LuaLibrary {
+    name: "table", 
+    func: Some(ffi::luaopen_table)
+};
+pub static IO_LIBRARY : LuaLibrary = LuaLibrary {
+    name: "io", 
+    func: Some(ffi::luaopen_io)
+};
+pub static OS_LIBRARY : LuaLibrary = LuaLibrary {
+    name: "os", 
+    func: Some(ffi::luaopen_os)
+};
+pub static STR_LIBRARY : LuaLibrary = LuaLibrary {
+    name: "string", 
+    func: Some(ffi::luaopen_string)
+};
+pub static MATH_LIBRARY : LuaLibrary = LuaLibrary {
+    name: "math", 
+    func: Some(ffi::luaopen_math)
+};
+pub static UTF8_LIBRARY : LuaLibrary = LuaLibrary {
+    name: "utf8", 
+    func: Some(ffi::luaopen_utf8)
+};
+pub static DEBUG_LIBRARY : LuaLibrary = LuaLibrary {
+    name: "debug", 
+    func: Some(ffi::luaopen_debug)
+};
 
 
 impl LuaState {
@@ -50,41 +76,26 @@ impl LuaState {
     }
 
 
-    pub fn load_library(&mut self, libraries: &[LuaRegistry]) {
+    pub fn load_library(&mut self, reg: &LuaLibrary) -> Result<(), Box<dyn std::error::Error>> {
+        let name = CString::new(reg.name)?;
         unsafe {
-            ffi::lua_createtable(self.ctx(), 0, libraries.len() as i32);
-
+            ffi::luaL_requiref(self.ctx(), name.as_ptr(), reg.func, 1);
+            ffi::lua_pop(self.ctx(), 1);
         }
+        Ok(())
     }
 
-    // pub fn open_base(&mut self) {
-    //     unsafe { ffi::luaopen_base(self.ctx()); }
-    // }
-    // pub fn open_coroutine(&mut self) {
-    //     unsafe { ffi::luaopen_coroutine(self.ctx()); }
-    // }
-    // pub fn open_table(&mut self) {
-    //     unsafe { ffi::luaopen_table(self.ctx()); }
-    // }
-    // pub fn open_io(&mut self) {
-    //     unsafe { ffi::luaopen_io(self.ctx()); }
-    // }
-    // pub fn open_os(&mut self) {
-    //     unsafe { ffi::luaopen_os(self.ctx()); }
-    // }
-    // pub fn open_string(&mut self) {
-    //     unsafe { ffi::luaopen_string(self.ctx()); }
-    // }
-    // pub fn open_utf8(&mut self) {
-    //     unsafe { ffi::luaopen_utf8(self.ctx()); }
-    // }
-    // pub fn open_math(&mut self) {
-    //     unsafe { ffi::luaopen_math(self.ctx()); }
-    // }
-    // pub fn open_debug(&mut self) {
-    //     unsafe { ffi::luaopen_debug(self.ctx()); }
-    // }
-    // pub fn open_package(&mut self) {
-    //     unsafe { ffi::luaopen_package(self.ctx()); }
-    // }
+    pub fn load_standard_libraries(&mut self) {
+        self.load_library(&BASE_LIBRARY);
+        self.load_library(&PACKAGE_LIBRARY);
+        self.load_library(&COROUTINE_LIBRARY);
+        self.load_library(&TABLE_LIBRARY);
+        self.load_library(&IO_LIBRARY);
+        self.load_library(&OS_LIBRARY);
+        self.load_library(&STR_LIBRARY);
+        self.load_library(&MATH_LIBRARY);
+        self.load_library(&UTF8_LIBRARY);
+        self.load_library(&DEBUG_LIBRARY);
+    }
+
 } 

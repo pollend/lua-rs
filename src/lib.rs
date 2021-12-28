@@ -268,3 +268,11 @@ pub use {
     bindings::luaopen_debug,
     bindings::luaopen_package,
 };
+
+
+/*
+** lauxlib
+*/
+pub use {
+    bindings::luaL_requiref
+};

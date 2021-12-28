@@ -7,7 +7,17 @@ mod lua_state;
 
 pub use lua_state::{
     LuaState,
-    LuaRegistry
+    LuaLibrary,
+    BASE_LIBRARY,
+    PACKAGE_LIBRARY,
+    COROUTINE_LIBRARY,
+    TABLE_LIBRARY,
+    IO_LIBRARY,
+    OS_LIBRARY,
+    STR_LIBRARY,
+    MATH_LIBRARY,
+    UTF8_LIBRARY,
+    DEBUG_LIBRARY
 };
 
 

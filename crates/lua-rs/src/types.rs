@@ -1,3 +1,5 @@
+use bitflags::bitflags;
+
 #[repr(i32)]
 #[derive(PartialEq)]
 pub enum LuaTypes {
@@ -15,8 +17,3 @@ pub enum LuaTypes {
 pub const LUA_RIDX_MAINTHREAD: u32 = ffi::LUA_RIDX_MAINTHREAD;
 pub const LUA_RIDX_GLOBALS: u32 = ffi::LUA_RIDX_GLOBALS;
 pub const LUA_RIDX_LAST: u32 = ffi::LUA_RIDX_LAST;
-
-
-// bitflags! {
-//     struct 
-// }
