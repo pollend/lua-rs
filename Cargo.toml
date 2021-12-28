@@ -1,5 +1,5 @@
 [package]
-name = "lua-sys"
+name = "lua_sys"
 version = "5.4.4"
 keywords = ["bindings", "lua"]
 categories = ["external-ffi-bindings"]

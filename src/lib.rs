@@ -15,9 +15,6 @@ pub mod bindings {
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 }
 
-pub const LUA_RIDX_GLOBALS: bindings::lua_Integer = bindings::LUA_RIDX_GLOBALS as bindings::lua_Integer;
-pub const LUA_REGISTRYINDEX: c_int = bindings::LUA_REGISTRYINDEX;
-
 pub use {
     bindings::LUA_VERSION_MAJOR,
     bindings::LUA_VERSION_MINOR,
@@ -28,7 +25,35 @@ pub use {
     bindings::LUA_RELEASE,
     bindings::LUA_COPYRIGHT,
     bindings::LUA_AUTHORS,
-    bindings::LUA_SIGNATURE
+    bindings::LUA_SIGNATURE,
+    // types
+    bindings::LUA_TNIL,
+    bindings::LUA_TBOOLEAN,
+    bindings::LUA_TLIGHTUSERDATA,
+    bindings::LUA_TNUMBER,
+    bindings::LUA_TSTRING,
+    bindings::LUA_TTABLE,
+    bindings::LUA_TFUNCTION,
+    bindings::LUA_TUSERDATA,
+    bindings::LUA_TTHREAD,
+    // gc
+    bindings::LUA_GCSTOP,
+    bindings::LUA_GCRESTART,
+    bindings::LUA_GCCOLLECT,
+    bindings::LUA_GCCOUNT,
+    bindings::LUA_GCCOUNTB,
+    bindings::LUA_GCSTEP,
+    bindings::LUA_GCSETPAUSE,
+    bindings::LUA_GCSETSTEPMUL,
+    bindings::LUA_GCISRUNNING,
+    bindings::LUA_GCGEN,
+    bindings::LUA_GCINC,
+
+    bindings::LUA_RIDX_MAINTHREAD,
+    bindings::LUA_RIDX_GLOBALS,
+    bindings::LUA_RIDX_LAST,
+
+    bindings::LUA_REGISTRYINDEX,
 };
 
 
@@ -187,7 +212,7 @@ pub unsafe fn lua_pushliteral(state: *mut lua_State, str: *const c_char) -> *con
 }
 
 pub unsafe fn lua_pushglobaltable(state: *mut lua_State) {
-    lua_rawgeti(state, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
+    lua_rawgeti(state, LUA_REGISTRYINDEX as i32, LUA_RIDX_GLOBALS as i64);
 }
 
 pub unsafe fn lua_newtable(state: *mut lua_State) {
@@ -220,3 +245,26 @@ pub unsafe fn lua_replace(state: *mut lua_State, idx: c_int) {
     lua_copy(state, -1, idx);
     lua_pop(state, 1);
 }
+
+pub unsafe fn lua_upvalueindex(index: c_int) -> i32 {
+    return LUA_REGISTRYINDEX - index;
+}
+
+/*
+** {==============================================================
+** lualib.h
+** ===============================================================
+*/
+
+pub use {
+    bindings::luaopen_base,
+    bindings::luaopen_coroutine,
+    bindings::luaopen_table,
+    bindings::luaopen_io,
+    bindings::luaopen_os,
+    bindings::luaopen_string,
+    bindings::luaopen_utf8,
+    bindings::luaopen_math,
+    bindings::luaopen_debug,
+    bindings::luaopen_package,
+};

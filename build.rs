@@ -11,10 +11,10 @@ fn main() {
     let dst = PathBuf::from(env::var_os("OUT_DIR").unwrap());
     let lua_dir = PathBuf::from("lua");
 
-    println!("cargo:rerun-if-changed={}", lua_dir.to_string_lossy());
+    println!("cargo:rerun-if-changed={}", "wrapper.h");
     let bindings = bindgen::Builder::default()
         .clang_arg(format!("-F{}",lua_dir.to_string_lossy()))
-        .header(lua_dir.join("lua.h").to_string_lossy())
+        .header("wrapper.h")
         .generate()
         .expect("Unable to generate bindings");
 
