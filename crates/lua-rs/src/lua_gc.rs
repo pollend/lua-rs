@@ -6,7 +6,7 @@ pub trait LuaStateGC {
     fn gc_restart(&mut self);
     fn gc_collect(&mut self);
     fn gc_count(&mut self) -> ByteUnit;
-    fn gc_step(&mut self);
+    fn gc_step(&mut self, step: i32);
     fn gc_pause(&mut self);
     fn gc_set_step_mul(&mut self);
     fn gc_is_running(&mut self) -> bool;

@@ -1,11 +1,23 @@
 use std::ptr;
 
+use crate::lua_library::LuaStateLibrary;
+use crate::lua_gc::LuaStateGC;
+
+
 pub struct LuaState {
     main_state: *mut ffi::lua_State,
     owned: bool
 }
 
-trait MethodTrait: 
+// trait LuaMethodTrait: LuaStateGC {}
+// trait LuaMainTrait: LuaStateGC +  LuaStateLibrary {}
+// pub fn test(t :&(impl LuaStateGC +  LuaStateLibrary)) {
+// }
+// pub fn a() {
+//     let mut t = LuaState::new();
+//     test(&t);
+// }
+
 
 impl LuaState {
     pub unsafe fn ctx(&self) -> *mut ffi::lua_State {
@@ -20,6 +32,9 @@ impl LuaState {
     }
 
     pub fn new() -> LuaState {
-        return LuaState{ main_state: ptr::null_mut() };
+        return LuaState{ 
+            main_state: ptr::null_mut(),
+            owned: true
+        };
     }
 } 
