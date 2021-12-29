@@ -1,5 +1,7 @@
 extern crate lua_sys as ffi;
 extern crate lua_macro;
+extern crate byte_unit;
+
 // pub use lua_sys as ffi::lua
 
 mod types;

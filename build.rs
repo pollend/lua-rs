@@ -13,7 +13,7 @@ fn main() {
 
     println!("cargo:rerun-if-changed={}", "wrapper.h");
     let bindings = bindgen::Builder::default()
-        .clang_arg(format!("-F{}",lua_dir.to_string_lossy()))
+        .clang_arg(format!("-I{}",lua_dir.to_string_lossy()))
         .header("wrapper.h")
         .generate()
         .expect("Unable to generate bindings");

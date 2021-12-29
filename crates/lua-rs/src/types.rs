@@ -1,4 +1,4 @@
-use bitflags::bitflags;
+// use bitflags::bitflags;
 
 #[repr(i32)]
 #[derive(PartialEq)]
@@ -13,6 +13,7 @@ pub enum LuaTypes {
     UserData = ffi::LUA_TUSERDATA as i32,
     Thread = ffi::LUA_TTHREAD as i32,
 }
+
 
 pub const LUA_RIDX_MAINTHREAD: u32 = ffi::LUA_RIDX_MAINTHREAD;
 pub const LUA_RIDX_GLOBALS: u32 = ffi::LUA_RIDX_GLOBALS;

@@ -1,14 +1,11 @@
 use std::ptr;
 use std::ffi::CString;
+use byte_unit::{Byte, ByteUnit, ByteError};
 
-pub struct LuaState {
-    main_state: *mut ffi::lua_State
-}
+// type luaCFunction = fn(ctx: LuaState) -> i32;
 
-type luaCFunction = fn(ctx: LuaState) -> i32;
-
-pub struct LuaLibrary {
-    pub name: &'static str,
+pub struct LuaLibrary<'a> {
+    pub name: &'a str,
     pub func: ffi::lua_CFunction,
 }
 
@@ -53,6 +50,20 @@ pub static DEBUG_LIBRARY : LuaLibrary = LuaLibrary {
     func: Some(ffi::luaopen_debug)
 };
 
+pub struct LuaState {
+    main_state: *mut ffi::lua_State
+}
+
+trait MainLuaState {
+
+}
+
+// trait LuaState {
+// }
+
+trait LuaGC {
+
+}
 
 impl LuaState {
     pub unsafe fn ctx(&self) -> *mut ffi::lua_State {
@@ -71,10 +82,64 @@ impl LuaState {
 
     pub fn gc_stop(&mut self) {
         unsafe {
-            ffi::lua_gc(self.ctx(), ffi::LUA_GCSTOP as i32, 0);
+            ffi::lua_gc(self.ctx(), ffi::LUA_GCSTOP as i32);
         }
     }
 
+    pub fn gc_restart(&mut self) {
+        unsafe {
+            ffi::lua_gc(self.ctx(), ffi::LUA_GCRESTART as i32);
+        }
+    }
+
+    pub fn gc_collect(&mut self) {
+        unsafe {
+            ffi::lua_gc(self.ctx(), ffi::LUA_GCCOLLECT as i32);
+        }
+    }
+
+
+    pub fn gc_count(&mut self) -> Result<Byte, ByteError> {
+        unsafe {
+            return Byte::from_unit(ffi::lua_gc(self.ctx(), ffi::LUA_GCCOUNTB as i32), ByteUnit::B)?;
+        }
+    }
+
+    pub fn gc_step(&mut self) {
+        unsafe {
+            ffi::lua_gc(self.ctx(), ffi::LUA_GCSTEP as i32, 0);
+        }
+    }
+
+    pub fn gc_pause(&mut self) {
+        unsafe {
+            ffi::lua_gc(self.ctx(), ffi::LUA_GCSETPAUSE as i32, 0);
+        }
+    }
+
+    pub fn gc_set_step_mul(&mut self) {
+        unsafe {
+            ffi::lua_gc(self.ctx(), ffi::LUA_GCSETSTEPMUL as i32, 0);
+        }
+    }
+
+    pub fn gc_is_running(&mut self) -> bool {
+        unsafe {
+            return ffi::lua_gc(self.ctx(), ffi::LUA_GCISRUNNING as i32) > 0 ;
+        }
+    }
+
+    pub fn gc_gen(&mut self) {
+        unsafe {
+            ffi::lua_gc(self.ctx(), ffi::LUA_GCGEN as i32, 0);
+        }
+    }
+
+    pub fn gc_inc(&mut self) {
+        unsafe {
+            ffi::lua_gc(self.ctx(), ffi::LUA_GCINC as i32, 0);
+        }
+    }
 
     pub fn load_library(&mut self, reg: &LuaLibrary) -> Result<(), Box<dyn std::error::Error>> {
         let name = CString::new(reg.name)?;
@@ -85,17 +150,18 @@ impl LuaState {
         Ok(())
     }
 
-    pub fn load_standard_libraries(&mut self) {
-        self.load_library(&BASE_LIBRARY);
-        self.load_library(&PACKAGE_LIBRARY);
-        self.load_library(&COROUTINE_LIBRARY);
-        self.load_library(&TABLE_LIBRARY);
-        self.load_library(&IO_LIBRARY);
-        self.load_library(&OS_LIBRARY);
-        self.load_library(&STR_LIBRARY);
-        self.load_library(&MATH_LIBRARY);
-        self.load_library(&UTF8_LIBRARY);
-        self.load_library(&DEBUG_LIBRARY);
+    pub fn load_standard_libraries(&mut self) -> Result<(), Box<dyn std::error::Error>>  {
+        self.load_library(&BASE_LIBRARY)?;
+        self.load_library(&PACKAGE_LIBRARY)?;
+        self.load_library(&COROUTINE_LIBRARY)?;
+        self.load_library(&TABLE_LIBRARY)?;
+        self.load_library(&IO_LIBRARY)?;
+        self.load_library(&OS_LIBRARY)?;
+        self.load_library(&STR_LIBRARY)?;
+        self.load_library(&MATH_LIBRARY)?;
+        self.load_library(&UTF8_LIBRARY)?;
+        self.load_library(&DEBUG_LIBRARY)?;
+        Ok(())
     }
 
 } 
