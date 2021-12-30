@@ -7,7 +7,7 @@ mod types;
 mod lua_state;
 mod lua_gc;
 mod lua_library;
-
+mod lua_stack;
 
 pub use lua_state::{
    LuaState
@@ -15,7 +15,7 @@ pub use lua_state::{
 
 pub use lua_library::{
     LuaLibrary,
-    LuaRegister,
+    // LuaRegister,
     BASE_LIBRARY,
     PACKAGE_LIBRARY,
     COROUTINE_LIBRARY,
@@ -39,4 +39,8 @@ pub use types::{
 
 pub mod prelude {
     pub use std::os::raw::c_int;
+    pub use lua_sys as ffi;
+    pub use std::ffi::CString;
+    pub use std::error::Error;
+    pub use std::boxed::Box;
 }
