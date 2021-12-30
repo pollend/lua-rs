@@ -15,9 +15,6 @@ pub mod bindings {
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 }
 
-pub const LUA_RIDX_GLOBALS: bindings::lua_Integer = bindings::LUA_RIDX_GLOBALS as bindings::lua_Integer;
-pub const LUA_REGISTRYINDEX: c_int = bindings::LUA_REGISTRYINDEX;
-
 pub use {
     bindings::LUA_VERSION_MAJOR,
     bindings::LUA_VERSION_MINOR,
@@ -28,7 +25,35 @@ pub use {
     bindings::LUA_RELEASE,
     bindings::LUA_COPYRIGHT,
     bindings::LUA_AUTHORS,
-    bindings::LUA_SIGNATURE
+    bindings::LUA_SIGNATURE,
+    // types
+    bindings::LUA_TNIL,
+    bindings::LUA_TBOOLEAN,
+    bindings::LUA_TLIGHTUSERDATA,
+    bindings::LUA_TNUMBER,
+    bindings::LUA_TSTRING,
+    bindings::LUA_TTABLE,
+    bindings::LUA_TFUNCTION,
+    bindings::LUA_TUSERDATA,
+    bindings::LUA_TTHREAD,
+    // gc
+    bindings::LUA_GCSTOP,
+    bindings::LUA_GCRESTART,
+    bindings::LUA_GCCOLLECT,
+    bindings::LUA_GCCOUNT,
+    bindings::LUA_GCCOUNTB,
+    bindings::LUA_GCSTEP,
+    bindings::LUA_GCSETPAUSE,
+    bindings::LUA_GCSETSTEPMUL,
+    bindings::LUA_GCISRUNNING,
+    bindings::LUA_GCGEN,
+    bindings::LUA_GCINC,
+
+    bindings::LUA_RIDX_MAINTHREAD,
+    bindings::LUA_RIDX_GLOBALS,
+    bindings::LUA_RIDX_LAST,
+
+    bindings::LUA_REGISTRYINDEX,
 };
 
 
@@ -187,7 +212,7 @@ pub unsafe fn lua_pushliteral(state: *mut lua_State, str: *const c_char) -> *con
 }
 
 pub unsafe fn lua_pushglobaltable(state: *mut lua_State) {
-    lua_rawgeti(state, LUA_REGISTRYINDEX, LUA_RIDX_GLOBALS);
+    lua_rawgeti(state, LUA_REGISTRYINDEX as i32, LUA_RIDX_GLOBALS as i64);
 }
 
 pub unsafe fn lua_newtable(state: *mut lua_State) {
@@ -220,3 +245,81 @@ pub unsafe fn lua_replace(state: *mut lua_State, idx: c_int) {
     lua_copy(state, -1, idx);
     lua_pop(state, 1);
 }
+
+pub unsafe fn lua_upvalueindex(index: c_int) -> i32 {
+    return LUA_REGISTRYINDEX - index;
+}
+
+/*
+** {==============================================================
+** lualib.h
+** ===============================================================
+*/
+
+pub use {
+    bindings::luaopen_base,
+    bindings::luaopen_coroutine,
+    bindings::luaopen_table,
+    bindings::luaopen_io,
+    bindings::luaopen_os,
+    bindings::luaopen_string,
+    bindings::luaopen_utf8,
+    bindings::luaopen_math,
+    bindings::luaopen_debug,
+    bindings::luaopen_package,
+};
+
+
+/*
+** lauxlib
+*/
+pub use {
+    bindings::luaL_requiref,
+    bindings::luaL_Reg,
+    bindings::luaL_setfuncs,
+    bindings::luaL_Buffer,
+    bindings::luaL_loadfilex,
+    bindings::luaL_checkversion_,
+    bindings::luaL_getmetafield,
+    bindings::luaL_callmeta,
+    bindings::luaL_tolstring,
+    bindings::luaL_argerror,
+    bindings::luaL_typeerror,
+    bindings::luaL_checklstring,
+    bindings::luaL_optlstring,
+    bindings::luaL_checknumber,
+    bindings::luaL_optnumber,
+    bindings::luaL_checkinteger,
+    bindings::luaL_optinteger,
+    bindings::luaL_checkstack,
+    bindings::luaL_checktype,
+    bindings::luaL_checkany,
+    bindings::luaL_newmetatable,
+    bindings::luaL_setmetatable,
+    bindings::luaL_testudata,
+    bindings::luaL_checkudata,
+    bindings::luaL_where,
+    bindings::luaL_error,
+    bindings::luaL_checkoption,
+    bindings::luaL_fileresult,
+    bindings::luaL_execresult,
+    bindings::luaL_ref,
+    bindings::luaL_unref,
+    bindings::luaL_loadbufferx,
+    bindings::luaL_loadstring,
+    bindings::luaL_newstate,
+    bindings::luaL_len,
+    bindings::luaL_gsub,
+    bindings::luaL_getsubtable,
+    bindings::luaL_traceback,
+    bindings::luaL_prepbuffsize,
+    bindings::luaL_buffinit,
+    bindings::luaL_addlstring,
+    bindings::luaL_addstring,
+    bindings::luaL_addvalue,
+    bindings::luaL_pushresult,
+    bindings::luaL_pushresultsize,
+    bindings::luaL_buffinitsize,
+    bindings::luaL_Stream,
+};
+

@@ -44,6 +44,9 @@ jobs:
           target: ${{ matrix.target }}
           toolchain: ${{ matrix.toolchain }}
           override: true
+      - name: Set LIBCLANG_PATH
+        run: echo "LIBCLANG_PATH=$((gcm clang).source -replace "clang.exe")" >> $env:GITHUB_ENV
+        if: matrix.target.os == 'x86_64-pc-windows-gnu' ||  matrix.target.os == 'x86_64-pc-windows-msvc'
       - run: ${{ matrix.deps }}
       - name: Test
         run: cargo test --target ${{ matrix.target }}

@@ -1,0 +1,13 @@
+[package]
+name = "lua_rs"
+version = "0.5.0"
+edition = "2018"
+description = "Heavy Duty Persistence for Lua"
+license = "Apache-2.0"
+keywords = ["lua"]
+
+[dependencies]
+lua_sys = { path = "../.."}
+lua_macro = { path = "../lua-macro" }
+libc = "0.2"
+bitflags = "1.3"
